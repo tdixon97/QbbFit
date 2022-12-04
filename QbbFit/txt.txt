@@ -1,0 +1,60 @@
+ +------------------------------------------------------+
+ |                                                      |
+ | BAT version 1.0.0                                    |
+ | Copyright (C) 2007-2018, the BAT core developer team |
+ | All rights reserved.                                 |
+ |                                                      |
+ | For the licensing terms see doc/COPYING              |
+ | For documentation see http://mpp.mpg.de/bat          |
+ | Please cite: DOI 10.1016/j.cpc.2009.06.026           |
+ |              http://arxiv.org/abs/0808.2552          |
+ |                                                      |
+ +------------------------------------------------------+
+
+Summary : Opening logfile log.txt
+TFile**		../SSD_AE.root	
+ TFile*		../SSD_AE.root	
+  KEY: TF1	fu;2	f2vbb(x)*pow((3034.4-x),-5) [current cycle]
+  KEY: TF1	fu;1	pol6 [backup cycle]
+4000
+TFile**		../M1_data_bkg_model.root	
+ TFile*		../M1_data_bkg_model.root	
+  OBJ: TH1D	Crystal_K40	Background model : 0 at: 0x55902911a220
+  OBJ: TH1D	data_M1_M2sum_M1alpha	Experimental spectrum : 0 at: 0x55902819f490
+  KEY: TH1D	Experimental_data;1	Experimental spectrum
+  KEY: TH1D	Background_model;1	Background model
+  KEY: TH1D	Crystal_2n2b_SSD;1	2n2b SSD
+Summary : Test model created
+Summary : Integrate using Sample Mean Monte Carlo
+Detail  : Running Sample Mean Monte Carlo integration over 5 dimensions.
+Summary :  --> Target relative precision:    1.000000e-02
+Summary :  --> Target absolute precision:    1.000000e-06
+Summary :  --> Result of integration:        0.000000e+00 +- 0.000000e+00
+Summary :  --> Obtained relative precision:  -nan. 
+Summary :  --> Number of iterations:         1000
+Summary : Marginalize using Metropolis
+Summary : Pre-run Metropolis MCMC for model "TestFit" ...
+Summary :  --> Perform MCMC pre-run with 4 chains, each with maximum 100000 iterations
+Detail  :      * Efficiency status: Efficiencies not within predefined range after 500 iterations. Efficiency of 
+Detail  :          chain 1 is below 15 % (12 %). Scale decreased to 0.7553
+Detail  :          chain 2 is below 15 % (5 %). Scale decreased to 0.7553
+Detail  :          chain 3 is below 15 % (11 %). Scale decreased to 0.7553
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 500 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.445 <-- Greater than threshold
+Detail  :          fB  :  1.118 <-- Greater than threshold
+Detail  :          p1  :  7.656 <-- Greater than threshold
+Detail  :          p2  :  2.182 <-- Greater than threshold
+Detail  :          Qbb :  1.453 <-- Greater than threshold
+Detail  :      * Efficiency status: Efficiencies not within predefined range after 1000 iterations. Efficiency of 
+Detail  :          chain 0 is below 15 % (3 %). Scale decreased to 0.7553
+Detail  :          chain 1 is below 15 % (zero). Scale decreased to 0.5035
+Detail  :          chain 2 is below 15 % (zero). Scale decreased to 0.5035
+Detail  :          chain 3 is below 15 % (3 %). Scale decreased to 0.5035
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 1000 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.216 <-- Greater than threshold
+Detail  :          fB  :  1.035
+Detail  :          p1  :  4.637 <-- Greater than threshold
+Detail  :          p2  :  2.148 <-- Greater than threshold
+Detail  :          Qbb :  1.184 <-- Greater than threshold

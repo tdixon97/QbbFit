@@ -1,0 +1,466 @@
+ +------------------------------------------------------+
+ |                                                      |
+ | BAT version 1.0.0                                    |
+ | Copyright (C) 2007-2018, the BAT core developer team |
+ | All rights reserved.                                 |
+ |                                                      |
+ | For the licensing terms see doc/COPYING              |
+ | For documentation see http://mpp.mpg.de/bat          |
+ | Please cite: DOI 10.1016/j.cpc.2009.06.026           |
+ |              http://arxiv.org/abs/0808.2552          |
+ |                                                      |
+ +------------------------------------------------------+
+Summary : Opening logfile log.txt
+Summary : Test model created
+Summary : Integrate using Sample Mean Monte Carlo
+Detail  : Running Sample Mean Monte Carlo integration over 5 dimensions.
+Summary :  --> Target relative precision:    1.000000e-02
+Summary :  --> Target absolute precision:    1.000000e-06
+Summary :  --> Result of integration:        0.000000e+00 +- 0.000000e+00
+Summary :  --> Obtained relative precision:  -nan. 
+Summary :  --> Number of iterations:         1000
+Summary : Marginalize using Metropolis
+Summary : Pre-run Metropolis MCMC for model "TestFit" ...
+Summary :  --> Perform MCMC pre-run with 4 chains, each with maximum 100000 iterations
+Detail  :      * Efficiency status: Efficiencies not within predefined range after 500 iterations. Efficiency of 
+Detail  :          chain 1 is below 15 % (13 %). Scale decreased to 0.7553
+Detail  :          chain 2 is below 15 % (3 %). Scale decreased to 0.7553
+Detail  :          chain 3 is below 15 % (10 %). Scale decreased to 0.7553
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 500 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.329 <-- Greater than threshold
+Detail  :          fB  :  1.013
+Detail  :          p1  :  2.192 <-- Greater than threshold
+Detail  :          p2  :  1.856 <-- Greater than threshold
+Detail  :          Qbb :  1.503 <-- Greater than threshold
+Detail  :      * Efficiency status: Efficiencies not within predefined range after 1000 iterations. Efficiency of 
+Detail  :          chain 0 is below 15 % (2 %). Scale decreased to 0.7553
+Detail  :          chain 1 is below 15 % (1 %). Scale decreased to 0.5035
+Detail  :          chain 2 is below 15 % (0.2 %). Scale decreased to 0.5035
+Detail  :          chain 3 is below 15 % (0.5 %). Scale decreased to 0.5035
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 1000 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.171 <-- Greater than threshold
+Detail  :          fB  :  1.017
+Detail  :          p1  :  2.291 <-- Greater than threshold
+Detail  :          p2  :  1.824 <-- Greater than threshold
+Detail  :          Qbb :  1.204 <-- Greater than threshold
+Detail  :      * Efficiency status: Efficiencies not within predefined range after 1500 iterations. Efficiency of 
+Detail  :          chain 0 is below 15 % (2 %). Scale decreased to 0.5035
+Detail  :          chain 1 is below 15 % (3 %). Scale decreased to 0.3357
+Detail  :          chain 2 is below 15 % (1 %). Scale decreased to 0.3357
+Detail  :          chain 3 is below 15 % (2 %). Scale decreased to 0.3357
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 1500 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.114 <-- Greater than threshold
+Detail  :          fB  :  1.013
+Detail  :          p1  :  2.079 <-- Greater than threshold
+Detail  :          p2  :  1.744 <-- Greater than threshold
+Detail  :          Qbb :  1.126 <-- Greater than threshold
+Detail  :      * Efficiency status: Efficiencies not within predefined range after 2000 iterations. Efficiency of 
+Detail  :          chain 0 is below 15 % (2 %). Scale decreased to 0.3357
+Detail  :          chain 1 is below 15 % (5 %). Scale decreased to 0.2238
+Detail  :          chain 2 is below 15 % (0.7 %). Scale decreased to 0.2238
+Detail  :          chain 3 is below 15 % (2 %). Scale decreased to 0.2238
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 2000 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.079
+Detail  :          fB  :  1.010
+Detail  :          p1  :  2.215 <-- Greater than threshold
+Detail  :          p2  :  1.692 <-- Greater than threshold
+Detail  :          Qbb :  1.085
+Detail  :      * Efficiency status: Efficiencies not within predefined range after 2500 iterations. Efficiency of 
+Detail  :          chain 0 is below 15 % (2 %). Scale decreased to 0.2238
+Detail  :          chain 1 is below 15 % (12 %). Scale decreased to 0.1492
+Detail  :          chain 2 is below 15 % (6 %). Scale decreased to 0.1492
+Detail  :          chain 3 is below 15 % (4 %). Scale decreased to 0.1492
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 2500 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.064
+Detail  :          fB  :  1.009
+Detail  :          p1  :  2.307 <-- Greater than threshold
+Detail  :          p2  :  1.693 <-- Greater than threshold
+Detail  :          Qbb :  1.071
+Detail  :      * Efficiency status: Efficiencies not within predefined range after 3000 iterations. Efficiency of 
+Detail  :          chain 0 is below 15 % (6 %). Scale decreased to 0.1492
+Detail  :          chain 1 is below 15 % (13 %). Scale decreased to 0.09946
+Detail  :          chain 2 is below 15 % (11 %). Scale decreased to 0.09946
+Detail  :          chain 3 is below 15 % (10 %). Scale decreased to 0.09946
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 3000 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.054
+Detail  :          fB  :  1.008
+Detail  :          p1  :  2.161 <-- Greater than threshold
+Detail  :          p2  :  1.505 <-- Greater than threshold
+Detail  :          Qbb :  1.059
+Detail  :      * Efficiency status: Efficiencies not within predefined range after 3500 iterations. Efficiency of 
+Detail  :          chain 0 is below 15 % (9 %). Scale decreased to 0.09946
+Detail  :          chain 3 is below 15 % (13 %). Scale decreased to 0.0663
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 3500 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.044
+Detail  :          fB  :  1.007
+Detail  :          p1  :  1.994 <-- Greater than threshold
+Detail  :          p2  :  1.414 <-- Greater than threshold
+Detail  :          Qbb :  1.048
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 4000 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.038
+Detail  :          fB  :  1.006
+Detail  :          p1  :  1.750 <-- Greater than threshold
+Detail  :          p2  :  1.341 <-- Greater than threshold
+Detail  :          Qbb :  1.041
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 4500 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.033
+Detail  :          fB  :  1.006
+Detail  :          p1  :  1.515 <-- Greater than threshold
+Detail  :          p2  :  1.324 <-- Greater than threshold
+Detail  :          Qbb :  1.035
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 5000 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.028
+Detail  :          fB  :  1.005
+Detail  :          p1  :  1.366 <-- Greater than threshold
+Detail  :          p2  :  1.243 <-- Greater than threshold
+Detail  :          Qbb :  1.030
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 5500 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.024
+Detail  :          fB  :  1.004
+Detail  :          p1  :  1.270 <-- Greater than threshold
+Detail  :          p2  :  1.234 <-- Greater than threshold
+Detail  :          Qbb :  1.026
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 6000 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.022
+Detail  :          fB  :  1.004
+Detail  :          p1  :  1.226 <-- Greater than threshold
+Detail  :          p2  :  1.170 <-- Greater than threshold
+Detail  :          Qbb :  1.023
+Detail  :      * Efficiency status: Efficiencies not within predefined range after 6500 iterations. Efficiency of 
+Detail  :          chain 1 is above 35 % (37 %). Scale increased to 0.1492
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 6500 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.019
+Detail  :          fB  :  1.003
+Detail  :          p1  :  1.200 <-- Greater than threshold
+Detail  :          p2  :  1.128 <-- Greater than threshold
+Detail  :          Qbb :  1.021
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 7000 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.018
+Detail  :          fB  :  1.003
+Detail  :          p1  :  1.175 <-- Greater than threshold
+Detail  :          p2  :  1.126 <-- Greater than threshold
+Detail  :          Qbb :  1.019
+Detail  :      * Efficiency status: Efficiencies not within predefined range after 7500 iterations. Efficiency of 
+Detail  :          chain 2 is above 35 % (36 %). Scale increased to 0.1492
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 7500 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.017
+Detail  :          fB  :  1.002
+Detail  :          p1  :  1.161 <-- Greater than threshold
+Detail  :          p2  :  1.122 <-- Greater than threshold
+Detail  :          Qbb :  1.019
+Detail  :      * Efficiency status: Efficiencies not within predefined range after 8000 iterations. Efficiency of 
+Detail  :          chain 0 is above 35 % (37 %). Scale increased to 0.1492
+Detail  :          chain 1 is above 35 % (38 %). Scale increased to 0.2238
+Detail  :          chain 2 is above 35 % (37 %). Scale increased to 0.2238
+Detail  :          chain 3 is above 35 % (35 %). Scale increased to 0.09946
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 8000 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.017
+Detail  :          fB  :  1.002
+Detail  :          p1  :  1.134 <-- Greater than threshold
+Detail  :          p2  :  1.109 <-- Greater than threshold
+Detail  :          Qbb :  1.018
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 8500 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.016
+Detail  :          fB  :  1.002
+Detail  :          p1  :  1.123 <-- Greater than threshold
+Detail  :          p2  :  1.103 <-- Greater than threshold
+Detail  :          Qbb :  1.016
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 9000 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.015
+Detail  :          fB  :  1.002
+Detail  :          p1  :  1.112 <-- Greater than threshold
+Detail  :          p2  :  1.083
+Detail  :          Qbb :  1.015
+Detail  :      * Convergence status: Set of 4 Markov chains did not converge after 9500 iterations.
+Detail  :        - Parameter :  R-Value
+Detail  :          fS  :  1.014
+Detail  :          fB  :  1.002
+Detail  :          p1  :  1.103 <-- Greater than threshold
+Detail  :          p2  :  1.075
+Detail  :          Qbb :  1.014
+Summary :  --> Set of 4 Markov chains converged within 10000 iterations, and all scales are adjusted.
+Summary :  --> 19 updates to multivariate proposal function's covariances were made.
+Detail  :  --> Scale factors and efficiencies (measured in last 500 iterations):
+Detail  :        - Chain : Scale factor    Efficiency
+Detail  :              0 :        0.1492        26.6 %
+Detail  :              1 :        0.2238        27.6 %
+Detail  :              2 :        0.2238        30.6 %
+Detail  :              3 :        0.09946        32.0 %
+Summary : Run Metropolis MCMC for model "TestFit" ...
+Summary :  --> Perform MCMC run with 4 chains, each with 100000 iterations.
+Detail  :  --> iteration number  10000 ( 10 %)
+Detail  :  --> iteration number  20000 ( 20 %)
+Detail  :  --> iteration number  30000 ( 30 %)
+Detail  :  --> iteration number  40000 ( 40 %)
+Detail  :  --> iteration number  50000 ( 50 %)
+Detail  :  --> iteration number  60000 ( 60 %)
+Detail  :  --> iteration number  70000 ( 70 %)
+Detail  :  --> iteration number  80000 ( 80 %)
+Detail  :  --> iteration number  90000 ( 90 %)
+Detail  :  --> iteration number 100000 (100 %)
+Summary :  --> Markov chains ran for 100000 iterations.
+Detail  :  --> Efficiencies (measured in 100000 iterations):
+Detail  :        - Chain : Efficiency
+Detail  :              0 :     31.0 %
+Detail  :              1 :     30.9 %
+Detail  :              2 :     29.0 %
+Detail  :              3 :     33.4 %
+Detail  :  --> Global mode from MCMC:
+Detail  :           fS  :    0.99992
+Detail  :           fB  :    0.99873
+Detail  :           p1  :    0.001405
+Detail  :           p2  :   -0.1426
+Detail  :           Qbb :    3034.64
+Summary : Printing all marginalized distributions (5 x 1D + 10 x 2D = 15) into file TestFit_plots.pdf
+Summary : Printing knowledge update plots (5 x 1D + 10 x 2D = 15) into file TestFit_update.pdf
+Summary : 
+Summary :  -----------------------------------------------------
+Summary :  Summary
+Summary :  -----------------------------------------------------
+Summary : 
+Summary :  Model summary
+Summary :  =============
+Summary :  Model: TestFit
+Summary :  Number of parameters: 5
+Summary : 
+Summary :  List of parameters and ranges:
+Summary :  0) fS  : [0.9, 1.1]
+Summary :  1) fB  : [0.9, 1.1]
+Summary :  2) p1  : [-0.2, 0.2]
+Summary :  3) p2  : [-0.2, 0.2]
+Summary :  4) Qbb : [3014, 3054]
+Summary : 
+Summary : 
+Summary :  Results of the optimization
+Summary :  ===========================
+Summary :  Optimization algorithm used: Default
+Summary :  Best Fit Results
+Summary :  ===========================
+Summary :  Log of the maximum posterior: -11348.275886
+Summary : 
+Summary :  Global mode:
+Summary :  0)  Parameter "fS"  : 0.999958 +- 0.00125883
+Summary :  1)  Parameter "fB"  : 0.998642 +- 0.00202937
+Summary :  2)  Parameter "p1"  : 2.336e-06 +- 0.02989
+Summary :  3)  Parameter "p2"  : -0.1924 +- 0.04988
+Summary :  4)  Parameter "Qbb" : 3034.654 +- 0.4006703
+Summary : 
+Summary :  Results of the integration
+Summary :  ============================
+Summary :  Integration method used: Sample Mean Monte Carlo
+Summary :  Evidence: 0.000000 +- 0.000000
+Summary :  Marginalization algorithm used: Metropolis
+Summary : 
+Summary :  Results of the marginalization
+Summary :  ==============================
+Summary :  List of variables and properties of the marginalized distributions:
+Summary : 
+Summary :   (0) Parameter "fS" :
+Summary :       Mean +- sqrt(Variance):         +0.999961 +- 0.00415563
+Summary :       Median +- central 68% interval: +0.999941 + 0.00415256 - 0.00411833
+Summary :       (Marginalized) mode:            +0.9994
+Summary :        5% quantile:                   +0.993116
+Summary :       10% quantile:                   +0.994587
+Summary :       16% quantile:                   +0.995822
+Summary :       84% quantile:                   +1.00409
+Summary :       90% quantile:                   +1.00531
+Summary :       95% quantile:                   +1.00686
+Summary :       Smallest interval containing 68.7% and local mode:
+Summary :       (0.9956, 1.004) (local mode at 0.9994 with rel. height 1; rel. area 1)
+Summary : 
+Summary :   (1) Parameter "fB" :
+Summary :       Mean +- sqrt(Variance):         +0.998652 +- 0.00223676
+Summary :       Median +- central 68% interval: +0.998653 + 0.00221704 - 0.00221996
+Summary :       (Marginalized) mode:            +0.9986
+Summary :        5% quantile:                   +0.994957
+Summary :       10% quantile:                   +0.99578
+Summary :       16% quantile:                   +0.996433
+Summary :       84% quantile:                   +1.00087
+Summary :       90% quantile:                   +1.00151
+Summary :       95% quantile:                   +1.00234
+Summary :       Smallest interval containing 71.8% and local mode:
+Summary :       (0.9964, 1.0012) (local mode at 0.9986 with rel. height 1; rel. area 1)
+Summary : 
+Summary :   (2) Parameter "p1" :
+Summary :       Mean +- sqrt(Variance):         +2.892e-05 +- 0.03025
+Summary :       Median +- central 68% interval: +0.0001485 + 0.03004 - 0.03037
+Summary :       (Marginalized) mode:            +0.0028
+Summary :        5% quantile:                   -0.05011
+Summary :       10% quantile:                   -0.03898
+Summary :       16% quantile:                   -0.03022
+Summary :       84% quantile:                   +0.03019
+Summary :       90% quantile:                   +0.03888
+Summary :       95% quantile:                   +0.04959
+Summary :       Smallest intervals containing 68.3% and local modes:
+Summary :       (-0.032, -0.0304) (local mode at -0.0316 with rel. height 0.5608; rel. area 0.01866)
+Summary :       (-0.0296, -0.0272) (local mode at -0.0276 with rel. height 0.5814; rel. area 0.02935)
+Summary :       (-0.0264, 0.0296) (local mode at 0.0028 with rel. height 1; rel. area 0.9427)
+Summary :       (0.0304, 0.0312) (local mode at 0.0308 with rel. height 0.5515; rel. area 0.00932)
+Summary : 
+Summary :   (3) Parameter "p2" :
+Summary :       Mean +- sqrt(Variance):         +0.001686 +- 0.1161
+Summary :       Median +- central 68% interval: +0.002762 + 0.1351 - 0.1391
+Summary :       (Marginalized) mode:            +0.19
+Summary :        5% quantile:                   -0.1794
+Summary :       10% quantile:                   -0.16
+Summary :       16% quantile:                   -0.1363
+Summary :       84% quantile:                   +0.1379
+Summary :       90% quantile:                   +0.1619
+Summary :       95% quantile:                   +0.1817
+Summary :       Smallest intervals containing 68.6% and local modes:
+Summary :       (-0.2, -0.1976) (local mode at -0.1996 with rel. height 0.7492; rel. area 0.009151)
+Summary :       (-0.1968, -0.196) (local mode at -0.1964 with rel. height 0.6596; rel. area 0.002846)
+Summary :       (-0.192, -0.1896) (local mode at -0.1908 with rel. height 0.7686; rel. area 0.009639)
+Summary :       (-0.188, -0.1848) (local mode at -0.1868 with rel. height 0.7711; rel. area 0.01231)
+Summary :       (-0.184, -0.1832) (local mode at -0.1836 with rel. height 0.7213; rel. area 0.003112)
+Summary :       (-0.1816, -0.1808) (local mode at -0.1812 with rel. height 0.7044; rel. area 0.003039)
+Summary :       (-0.1784, -0.1752) (local mode at -0.178 with rel. height 0.799; rel. area 0.01258)
+Summary :       (-0.1744, -0.1712) (local mode at -0.1732 with rel. height 0.7213; rel. area 0.01189)
+Summary :       (-0.1704, -0.1664) (local mode at -0.1668 with rel. height 0.7939; rel. area 0.01572)
+Summary :       (-0.1656, -0.1632) (local mode at -0.1636 with rel. height 0.8345; rel. area 0.009956)
+Summary :       (-0.1624, -0.1608) (local mode at -0.1612 with rel. height 0.7323; rel. area 0.006173)
+Summary :       (-0.16, -0.152) (local mode at -0.1564 with rel. height 0.7652; rel. area 0.03062)
+Summary :       (-0.1512, -0.1496) (local mode at -0.15 with rel. height 0.663; rel. area 0.005663)
+Summary :       (-0.1472, -0.1416) (local mode at -0.1452 with rel. height 0.734; rel. area 0.02079)
+Summary :       (-0.1408, -0.1392) (local mode at -0.1396 with rel. height 0.7804; rel. area 0.006221)
+Summary :       (-0.1384, -0.1376) (local mode at -0.138 with rel. height 0.701; rel. area 0.003025)
+Summary :       (-0.1368, -0.1352) (local mode at -0.1364 with rel. height 0.7736; rel. area 0.006625)
+Summary :       (-0.1336, -0.1296) (local mode at -0.1324 with rel. height 0.7551; rel. area 0.01551)
+Summary :       (-0.1256, -0.124) (local mode at -0.1244 with rel. height 0.7525; rel. area 0.006203)
+Summary :       (-0.1224, -0.1216) (local mode at -0.122 with rel. height 0.7483; rel. area 0.003229)
+Summary :       (-0.1208, -0.1184) (local mode at -0.1188 with rel. height 0.7255; rel. area 0.009235)
+Summary :       (-0.1168, -0.1144) (local mode at -0.1156 with rel. height 0.6976; rel. area 0.008976)
+Summary :       (-0.1136, -0.1128) (local mode at -0.1132 with rel. height 0.6807; rel. area 0.002937)
+Summary :       (-0.1096, -0.1088) (local mode at -0.1092 with rel. height 0.6917; rel. area 0.002985)
+Summary :       (-0.108, -0.1064) (local mode at -0.1068 with rel. height 0.712; rel. area 0.0061)
+Summary :       (-0.1048, -0.1032) (local mode at -0.1036 with rel. height 0.7196; rel. area 0.006111)
+Summary :       (-0.1024, -0.1) (local mode at -0.1012 with rel. height 0.7525; rel. area 0.009348)
+Summary :       (-0.0984, -0.0968) (local mode at -0.098 with rel. height 0.7314; rel. area 0.005958)
+Summary :       (-0.0952, -0.0944) (local mode at -0.0948 with rel. height 0.7255; rel. area 0.00313)
+Summary :       (-0.0936, -0.0904) (local mode at -0.0908 with rel. height 0.7779; rel. area 0.01196)
+Summary :       (-0.088, -0.0872) (local mode at -0.0876 with rel. height 0.6841; rel. area 0.002952)
+Summary :       (-0.0864, -0.0848) (local mode at -0.0852 with rel. height 0.6934; rel. area 0.005889)
+Summary :       (-0.084, -0.0832) (local mode at -0.0836 with rel. height 0.6875; rel. area 0.002966)
+Summary :       (-0.0824, -0.0808) (local mode at -0.082 with rel. height 0.7306; rel. area 0.00598)
+Summary :       (-0.08, -0.0792) (local mode at -0.0796 with rel. height 0.8387; rel. area 0.003619)
+Summary :       (-0.0768, -0.0744) (local mode at -0.0764 with rel. height 0.7095; rel. area 0.008998)
+Summary :       (-0.0728, -0.0712) (local mode at -0.0716 with rel. height 0.7365; rel. area 0.006152)
+Summary :       (-0.0704, -0.0688) (local mode at -0.0692 with rel. height 0.6571; rel. area 0.005641)
+Summary :       (-0.068, -0.0656) (local mode at -0.0676 with rel. height 0.7356; rel. area 0.009045)
+Summary :       (-0.0648, -0.064) (local mode at -0.0644 with rel. height 0.7238; rel. area 0.003123)
+Summary :       (-0.0632, -0.0624) (local mode at -0.0628 with rel. height 0.8184; rel. area 0.003531)
+Summary :       (-0.0616, -0.0592) (local mode at -0.0604 with rel. height 0.6985; rel. area 0.008688)
+Summary :       (-0.0568, -0.0552) (local mode at -0.0564 with rel. height 0.8184; rel. area 0.006377)
+Summary :       (-0.0544, -0.0536) (local mode at -0.054 with rel. height 0.6883; rel. area 0.00297)
+Summary :       (-0.052, -0.0504) (local mode at -0.0508 with rel. height 0.7568; rel. area 0.006159)
+Summary :       (-0.048, -0.0464) (local mode at -0.0468 with rel. height 0.7255; rel. area 0.005991)
+Summary :       (-0.0456, -0.044) (local mode at -0.0452 with rel. height 0.7002; rel. area 0.005988)
+Summary :       (-0.0416, -0.04) (local mode at -0.0404 with rel. height 0.734; rel. area 0.006235)
+Summary :       (-0.0392, -0.036) (local mode at -0.0372 with rel. height 0.7449; rel. area 0.01214)
+Summary :       (-0.0344, -0.0336) (local mode at -0.034 with rel. height 0.7128; rel. area 0.003076)
+Summary :       (-0.0328, -0.032) (local mode at -0.0324 with rel. height 0.7584; rel. area 0.003273)
+Summary :       (-0.0304, -0.0296) (local mode at -0.03 with rel. height 0.6858; rel. area 0.002959)
+Summary :       (-0.0288, -0.028) (local mode at -0.0284 with rel. height 0.6985; rel. area 0.003014)
+Summary :       (-0.0272, -0.0248) (local mode at -0.026 with rel. height 0.6976; rel. area 0.008728)
+Summary :       (-0.024, -0.0224) (local mode at -0.0236 with rel. height 0.7652; rel. area 0.00617)
+Summary :       (-0.0208, -0.02) (local mode at -0.0204 with rel. height 0.6816; rel. area 0.002941)
+Summary :       (-0.0192, -0.0152) (local mode at -0.0188 with rel. height 0.7703; rel. area 0.01536)
+Summary :       (-0.0144, -0.0136) (local mode at -0.014 with rel. height 0.6571; rel. area 0.002835)
+Summary :       (-0.0128, -0.008) (local mode at -0.0116 with rel. height 0.7584; rel. area 0.018)
+Summary :       (-0.0048, -0.0032) (local mode at -0.0036 with rel. height 0.6824; rel. area 0.005758)
+Summary :       (-0.0024, -0.0016) (local mode at -0.002 with rel. height 0.7323; rel. area 0.00316)
+Summary :       (-0.0008, 0.0048) (local mode at 0.0004 with rel. height 0.7905; rel. area 0.02131)
+Summary :       (0.0064, 0.0072) (local mode at 0.0068 with rel. height 0.6664; rel. area 0.002875)
+Summary :       (0.008, 0.0088) (local mode at 0.0084 with rel. height 0.7289; rel. area 0.003145)
+Summary :       (0.0136, 0.0144) (local mode at 0.014 with rel. height 0.7078; rel. area 0.003054)
+Summary :       (0.0176, 0.0184) (local mode at 0.018 with rel. height 0.7449; rel. area 0.003214)
+Summary :       (0.0192, 0.0216) (local mode at 0.0204 with rel. height 0.8454; rel. area 0.009796)
+Summary :       (0.0224, 0.0232) (local mode at 0.0228 with rel. height 0.701; rel. area 0.003025)
+Summary :       (0.024, 0.028) (local mode at 0.0276 with rel. height 0.7745; rel. area 0.01496)
+Summary :       (0.0288, 0.0336) (local mode at 0.0324 with rel. height 0.7483; rel. area 0.01847)
+Summary :       (0.0344, 0.0376) (local mode at 0.0364 with rel. height 0.69; rel. area 0.01164)
+Summary :       (0.0384, 0.0392) (local mode at 0.0388 with rel. height 0.6909; rel. area 0.002981)
+Summary :       (0.0424, 0.044) (local mode at 0.0436 with rel. height 0.7601; rel. area 0.006352)
+Summary :       (0.0448, 0.048) (local mode at 0.0452 with rel. height 0.7061; rel. area 0.01171)
+Summary :       (0.0488, 0.0504) (local mode at 0.0492 with rel. height 0.7441; rel. area 0.006341)
+Summary :       (0.052, 0.0552) (local mode at 0.0532 with rel. height 0.7171; rel. area 0.01209)
+Summary :       (0.056, 0.0568) (local mode at 0.0564 with rel. height 0.7424; rel. area 0.003203)
+Summary :       (0.0576, 0.0584) (local mode at 0.058 with rel. height 0.7846; rel. area 0.003386)
+Summary :       (0.0592, 0.06) (local mode at 0.0596 with rel. height 0.6943; rel. area 0.002996)
+Summary :       (0.0608, 0.0616) (local mode at 0.0612 with rel. height 0.8471; rel. area 0.003655)
+Summary :       (0.0624, 0.064) (local mode at 0.0636 with rel. height 0.7872; rel. area 0.006414)
+Summary :       (0.0648, 0.0664) (local mode at 0.066 with rel. height 0.6824; rel. area 0.005765)
+Summary :       (0.0672, 0.072) (local mode at 0.0676 with rel. height 0.799; rel. area 0.01892)
+Summary :       (0.0728, 0.0736) (local mode at 0.0732 with rel. height 0.81; rel. area 0.003495)
+Summary :       (0.0744, 0.0752) (local mode at 0.0748 with rel. height 0.6554; rel. area 0.002828)
+Summary :       (0.076, 0.08) (local mode at 0.078 with rel. height 0.7323; rel. area 0.0151)
+Summary :       (0.0808, 0.0912) (local mode at 0.0828 with rel. height 0.8209; rel. area 0.04145)
+Summary :       (0.092, 0.0944) (local mode at 0.0932 with rel. height 0.8057; rel. area 0.009705)
+Summary :       (0.0952, 0.0968) (local mode at 0.0964 with rel. height 0.7204; rel. area 0.006031)
+Summary :       (0.0992, 0.1016) (local mode at 0.0996 with rel. height 0.81; rel. area 0.009581)
+Summary :       (0.1024, 0.108) (local mode at 0.1076 with rel. height 0.7829; rel. area 0.02138)
+Summary :       (0.1088, 0.1104) (local mode at 0.11 with rel. height 0.799; rel. area 0.00633)
+Summary :       (0.1112, 0.1128) (local mode at 0.1116 with rel. height 0.8514; rel. area 0.006651)
+Summary :       (0.1136, 0.1152) (local mode at 0.1148 with rel. height 0.6605; rel. area 0.005667)
+Summary :       (0.1184, 0.1232) (local mode at 0.1204 with rel. height 0.7373; rel. area 0.01831)
+Summary :       (0.124, 0.1304) (local mode at 0.1252 with rel. height 0.7568; rel. area 0.02383)
+Summary :       (0.1312, 0.1368) (local mode at 0.1324 with rel. height 0.701; rel. area 0.0206)
+Summary :       (0.1376, 0.1392) (local mode at 0.1388 with rel. height 0.7821; rel. area 0.006531)
+Summary :       (0.1408, 0.1472) (local mode at 0.1412 with rel. height 0.7576; rel. area 0.02374)
+Summary :       (0.1496, 0.152) (local mode at 0.15 with rel. height 0.7804; rel. area 0.009606)
+Summary :       (0.1528, 0.1536) (local mode at 0.1532 with rel. height 0.6934; rel. area 0.002992)
+Summary :       (0.1544, 0.1576) (local mode at 0.1564 with rel. height 0.7694; rel. area 0.01239)
+Summary :       (0.1592, 0.16) (local mode at 0.1596 with rel. height 0.7694; rel. area 0.00332)
+Summary :       (0.1608, 0.1648) (local mode at 0.162 with rel. height 0.7399; rel. area 0.01503)
+Summary :       (0.1656, 0.1672) (local mode at 0.1668 with rel. height 0.6816; rel. area 0.005809)
+Summary :       (0.168, 0.176) (local mode at 0.1708 with rel. height 0.7846; rel. area 0.03113)
+Summary :       (0.1776, 0.1784) (local mode at 0.178 with rel. height 0.7128; rel. area 0.003076)
+Summary :       (0.1792, 0.1808) (local mode at 0.1796 with rel. height 0.6867; rel. area 0.005918)
+Summary :       (0.1816, 0.1888) (local mode at 0.1844 with rel. height 0.8851; rel. area 0.02857)
+Summary :       (0.1896, 0.1928) (local mode at 0.19 with rel. height 1; rel. area 0.01414)
+Summary :       (0.1936, 0.1992) (local mode at 0.198 with rel. height 0.9527; rel. area 0.02274)
+Summary : 
+Summary :   (4) Parameter "Qbb" :
+Summary :       Mean +- sqrt(Variance):         +3034.655 +- 1.28778
+Summary :       Median +- central 68% interval: +3034.661 + 1.272376 - 1.286478
+Summary :       (Marginalized) mode:            +3034.76
+Summary :        5% quantile:                   +3032.519
+Summary :       10% quantile:                   +3032.997
+Summary :       16% quantile:                   +3033.375
+Summary :       84% quantile:                   +3035.934
+Summary :       90% quantile:                   +3036.314
+Summary :       95% quantile:                   +3036.781
+Summary :       Smallest interval containing 68.1% and local mode:
+Summary :       (3033.44, 3036) (local mode at 3034.76 with rel. height 1; rel. area 1)
+Summary : 
+Summary :  Status of the MCMC
+Summary :  ==================
+Summary :  Convergence reached:                    yes
+Summary :  Number of iterations until convergence: 10000
+Summary :  Number of chains:                       4
+Summary :  Number of iterations per chain:         100000
+Detail  :  Scale factors and efficiencies (measured in last 100000 iterations):
+Detail  :  Chain : Scale factor    Efficiency
+Detail  :      0 :       0.1492        31.0 %
+Detail  :      1 :       0.2238        30.9 %
+Detail  :      2 :       0.2238        29.0 %
+Detail  :      3 :       0.09946        33.4 %
+Summary : Exiting
