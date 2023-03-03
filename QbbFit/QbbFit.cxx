@@ -7,6 +7,7 @@
 
 #include "QbbFit.h"
 #include "TF1.h"
+#include "TH3D.h"
 #include "TFile.h"
 #include <BAT/BCMath.h>
 void QbbFit::MakePlots(TCanvas *&c, TCanvas *&cK, std::vector<double>pars)
@@ -52,9 +53,33 @@ void QbbFit::MakePlots(TCanvas *&c, TCanvas *&cK, std::vector<double>pars)
       fEfficiencyBkg->SetParameter(0,p1);
       double B_pred = fEfficiencyBkg->Eval(energy)*B*fBkg->GetBinContent(fBkg->FindBin(energy));
       hPlotBkg->SetBinContent(i,B_pred);
-      // get the predicted signal                                                                                                                                                                          
+      // get the predicted signal
+      double S_pred;
+      double energyBias;
+      if (fFloatBias)
+        {
+          fBiasp0=pars[5];
+          fBiasp1=pars[6];
+          fBiasp2=pars[7];
+
+
+
+          fEnergyBias->SetParameters(fBiasp0,fBiasp1,fBiasp2);
+	  
+	  energyBias=fEnergyBias->Eval(energy);
+	  
+        }
+
       //fEfficiency->SetParameter(0,p1);
-      double S_pred =fBinning*S*fShape->Eval(energy)*fEfficiency->Eval(energy)*pow(Q-energy,5);
+      if (!fFloatBias)
+        {
+          S_pred=fBinning*S*fShape->Eval(energy)*fEfficiency->Eval(energy)*pow(Q-energy,5);
+        }
+      else
+        {
+          energy=energy-energyBias;
+          S_pred=fBinning*S*fShape->Eval(energy)*fEfficiency->Eval(energy)*pow(Q-energy,5);
+        }
       if (S_pred<0)
 	S_pred=0;
       
@@ -65,11 +90,8 @@ void QbbFit::MakePlots(TCanvas *&c, TCanvas *&cK, std::vector<double>pars)
 
 
       // FILL THE KURIE PLOT
-
+      
       double value = fData->GetBinContent(i)-B_pred;
-      std::cout<<"value "<<pow(value/(fBinning*fShape->Eval(energy)),0.2)<<std::endl;
-      std::cout<<fShape->Eval(energy)<<std::endl;
-      std::cout<<"energy = "<<energy<<std::endl;
       if (value>0 &&fShape->Eval(energy)>0)
         hKurie->SetBinContent(i,pow(value/(fBinning*fShape->Eval(energy)),0.2));
       else if (value<0 &&fShape->Eval(energy)>0)
@@ -215,14 +237,15 @@ void QbbFit::MakePlots(TCanvas *&c, TCanvas *&cK, std::vector<double>pars)
 }
   
   // ---------------------------------------------------------
-QbbFit::QbbFit(const std::string& name,TString path_shape,TString path_bkg,bool fix)
+QbbFit::QbbFit(const std::string& name,TString path_shape,TString path_bkg,TString path_bias,bool fix,bool floatbias,bool fullefficiency)
     : BCModel(name)
 {
 
 
   fFix=fix;
   // get the inputs
-
+  fFloatBias=floatbias;
+  fFullEfficiency=fullefficiency;
   TFile *f_shape = new TFile(path_shape);
   fShape =(TF1*)f_shape->Get("fu");
   f_shape->ls();
@@ -234,6 +257,11 @@ QbbFit::QbbFit(const std::string& name,TString path_shape,TString path_bkg,bool 
   fEfficiency =new TF1("fEfficiency","1+[0]*x/3034.",0,4000);
   fEfficiencyBkg =new TF1("fEfficiencyBkg","1+[0]*x/3034.",0,4000);
 
+  TFile *f_bias =new TFile(path_bias);
+  fBias =(TH3D*)f_bias->Get("h_bias");
+
+  fp1Sigma=0.03;
+  fEnergyBias=new TF1("fEnergyBias","pol2",0,4000);
    
   // some defaults
   fUpper=3500.;
@@ -254,13 +282,29 @@ QbbFit::QbbFit(const std::string& name,TString path_shape,TString path_bkg,bool 
   AddParameter("fS",0.9,1.1,"f_{S}"," ");
   AddParameter("fB",0.9,1.1,"f_{B}"," ");
   AddParameter("p1",-0.2,0.2,"p1"," ");
-  AddParameter("p2",-0.2,0.2,"p2"," ");
 
   AddParameter("Qbb",3034-20,3034+20,"Q_{#beta#beta}","[keV]");
 
+  if (fFloatBias==true)
+    {
+      AddParameter("Biasp0",-2,2,"biasp0"," ");
+      AddParameter("Biasp1",-2e-3,1e-3,"biasp1"," ");
+      AddParameter("Biasp2",-5e-7,7e-7,"biasp2"," ");
+    }
 
-  GetParameters().SetPriorConstantAll();
-  SetPriorGauss("p1",0.0,0.03,0.03);
+  
+  
+
+ 
+  if (fFullEfficiency==true)
+    {
+      AddParameter("PCAp0",0,2,"PCAp0"," ");
+      AddParameter("PCAp1",-1e-3,1e-3,"PCAp1"," ");
+      AddParameter("LYp0",0,2,"LYp0"," ");
+      AddParameter("LYp1",-1e-3,1e-3,"LYp1"," ");
+
+    }
+
   GetParameters().SetNBins(500);
 
   
@@ -291,8 +335,10 @@ double QbbFit::LogLikelihood(const std::vector<double>& pars)
   double S  = pars[0];
   double B  = pars[1];
   double p1 = pars[2];
-  double p2=pars[3];
   double Q  = pars[4];
+
+
+
   for (int i=fData->FindBin(fLower);i<fData->FindBin(fUpper);i++)
     {;
       // get th
@@ -303,25 +349,49 @@ double QbbFit::LogLikelihood(const std::vector<double>& pars)
 	{
 	  p1=0;
 	}
+
+      double energyBias;
+      if (fFloatBias==true)
+	{
+	  fBiasp0=pars[5];
+	  fBiasp1=pars[6];
+	  fBiasp2=pars[7];
 	  
+
+	  
+	  fEnergyBias->SetParameters(fBiasp0,fBiasp1,fBiasp2);
+	  energyBias=fEnergyBias->Eval(energy);
+	}
       fEfficiency->SetParameter(0,p1);
       fEfficiencyBkg->SetParameter(0,p1);
       // get the predicted background
       double B_pred = fEfficiencyBkg->Eval(energy)*B*fBkg->GetBinContent(fBkg->FindBin(energy));
+
       
       // get the predicted signal
       //fEfficiency->SetParameter(0,p1);
-      double S_pred =fBinning*S*fShape->Eval(energy)*fEfficiency->Eval(energy)*pow(Q-energy,5);
+      
+      double S_pred;
+      if (!fFloatBias)
+	{
+	  S_pred=fBinning*S*fShape->Eval(energy)*fEfficiency->Eval(energy)*pow(Q-energy,5);
+	}
+      else
+	{
+	  energy=-energyBias+energy;
+	  S_pred=fBinning*S*fShape->Eval(energy)*fEfficiency->Eval(energy)*pow(Q-energy,5);
+	}
       if (energy>Q)
 	{
+
 	  S_pred=0;
 	}
-		    
       double lambda = B_pred+S_pred;
+      //std::cout<<lambda<<std::endl;
       if( lambda <= 0. ) continue;
       logL += -lambda + N * log( lambda ) - BCMath::LogFact( N );
 
-      if (verbose &&i%10000==0)
+      if (i==17 && fCounter%100000==0)
 	{
           std::cout<<"energy = "<<energy<<std::endl;
           std::cout<<"N      = "<<N<<std::endl;
@@ -341,11 +411,61 @@ double QbbFit::LogLikelihood(const std::vector<double>& pars)
 }
 
 // ---------------------------------------------------------
-// double QbbFit::LogAPrioriProbability(const std::vector<double>& pars)
-// {
-//     // return the log of the prior probability p(pars)
-//     // If you use built-in priors, leave this function commented out.
-// }
+ double QbbFit::LogAPrioriProbability(const std::vector<double>& pars)
+ {
+   // return the log of the prior probability p(pars)
+   // If you use built-in priors, leave this function commented out.
+   
+   // We have up to 8 parameters
+
+   double logPrior=0;
+
+
+   // 0,1,2,3 have uniform
+   double low,high;
+   for (int i=0;i<4;i++)
+     {
+       low =GetParameter(i).GetLowerLimit();
+       high =GetParameter(i).GetUpperLimit();
+       if (pars[i]>low &&pars[i]<high)
+	 logPrior+=log(1/(high-low));
+       else
+	 logPrior-=1e20;
+     
+     }
+       
+   double mean=0;
+   double sigma=fp1Sigma;
+   // gaussian prior on par 4
+   if (fFix==0)
+     logPrior+=log(1/(sqrt(2*3.14)*sigma))-pow((pars[4]-mean)/sigma,2)/0.5;
+
+   if (fFloatBias==true)
+    {
+      double prob = fBias->GetBinContent(fBias->FindBin(pars[7],pars[6],pars[5]));
+
+      if (prob!=0)
+	{
+	  logPrior+=log(prob);
+	}
+      else
+	logPrior-=1e20;
+    
+    }
+
+   if (fCounter%100000==0)
+     {
+       std::cout<<"log Prior = "<<logPrior<<std::endl;
+       std::cout<<pars[5]<<" "<<pars[6]<<" "<<pars[7]<<std::endl;
+
+     }
+
+   return logPrior;
+  
+
+
+
+ }
 
 // ---------------------------------------------------------
 // void QbbFit::CalculateObservables(const std::vector<double>& pars)
