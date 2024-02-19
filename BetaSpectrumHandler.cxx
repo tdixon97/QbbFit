@@ -1,61 +1,153 @@
-void macro(double &Q,double &eQ,double binning=20,double fitlow=300,double factor=1,double effslope=0)
+void ResetErrors(TH1D*&h,double N=1e8)
+{
+  h->Scale(N/h->Integral());
+  for (int i=1;i<h->GetNbinsX();i++)
+    {
+      h->SetBinError(i,0,sqrt(h->GetBinContent(i)));
+    }
+}
+     
+
+void macro(double &Q,double &eQ,double effslope=0,bool imp=1)
 {
   // the aim of this macro is to first compare some plots of 2vbb shape shifting Qbb
 
 
-  TFile * f= new TFile("M1_data_bkg_model.root");
+  double G0= 3.279;
+  double G2=1.498;
+  double G22=0.1972;
+  double G4=0.8576;
+  TFile * f;
 
+  if (imp==0)
+    f = new TFile("inputs/M1_data_bkg_model_2n2b_fix.root");
+  else
+    f=new TFile("inputs/M1_data_bkg_model_2n2b_improved.root");
 
-  TH1D *h2vbb = (TH1D*)f->Get("Crystal_2n2b_SSD");
+  
+
+  TH1D *h2vbb;
+  TH1D*h0;
+  TH1D*h2;
+  TH1D*h22;
+  TH1D*h4;
+  std::vector<double>G;
+  std::vector<TH1D*>contributions;
+  std::vector<TString> names;
+  double N0;
+  double N;
+  if (!imp)
+    {
+      h2vbb= (TH1D*)f->Get("Crystal_2n2b_SSD");
+      contributions.push_back(h2vbb);
+      names.push_back("2vbb");
+      N0=h2vbb->Integral();
+    }
+  else
+    {
+      f->Print();
+      h0=(TH1D*)f->Get("Crystal_2n2b_0sfs");
+      h2=(TH1D*)f->Get("Crystal_2n2b_2sfs");
+      h22=(TH1D*)f->Get("Crystal_2n2b_22sfs");
+      h4=(TH1D*)f->Get("Crystal_2n2b_4sfs");
+      contributions.push_back(h0);
+      contributions.push_back(h2);
+      contributions.push_back(h22);
+      contributions.push_back(h4);
+      names.push_back("h0");
+      names.push_back("h2");
+      names.push_back("h22");
+      names.push_back("h4");
+      G.push_back(G0);
+      G.push_back(G2);
+      G.push_back(G22);
+      G.push_back(G4);
+      N = h0->Integral()+h2->Integral()+h22->Integral()+h4->Integral();
+      N0=h0->Integral()/G0;
+     
+      ResetErrors(h0);
+      ResetErrors(h2);
+      ResetErrors(h22);
+      ResetErrors(h4);
+    }
+  std::cout<<"N "<<N<<std::endl;
+  std::cout<<"N0 = "<<N0<<std::endl;
+  std::cout<<"N0*G0 = "<<N0*G0<<std::endl;
+  double xi31=0.368;
+  double xi51=0.4;
+  double NT=N0*G0+N0*G2*xi31+N0*G22*xi31*xi31/3.+N0*G4*(xi31*xi31/3.+xi51);
+  std::cout<<"NT = "<<NT<<std::endl;
+  TFile *fout;
+
+  if (!imp)
+    fout= new TFile("inputs/SSD_AE.root","recreate");
+  else
+    fout=new TFile("inputs/improved_AE.root","recreate");
+  
+		   
   TCanvas *c1 = new TCanvas("c1","c1");
   c1->Divide(3,1);
-  c1->cd(1);
-  h2vbb->Draw("HIST");
-
-
-  // now lets compute the estimate A(E)
-
-  TH1D *hA = (TH1D*)h2vbb->Clone("hA");
-
-  TF1 *fe = new TF1("fe","1+x*[0]/3034.");
-  fe->SetParameter(0,effslope);
-  for (int i=1;i<h2vbb->GetNbinsX()+1;i++)
+  TH1D *htmp;
+  c1->Print("beta_debug.pdf(","pdf");
+  for (int i=0;i<contributions.size();i++)
     {
-      hA->SetBinContent(i,fe->Eval(h2vbb->GetBinCenter(i))*h2vbb->GetBinContent(i)*pow(3034.4-h2vbb->GetBinCenter(i),-5));
-      hA->SetBinError(i,0,fe->Eval(h2vbb->GetBinCenter(i))*h2vbb->GetBinError(i)*pow(3034.4-h2vbb->GetBinCenter(i),-5));
-	    
+      htmp=contributions[i];
+      
+      // c1->Divide(3,1);
+      c1->cd(1);
+      htmp->Draw("HIST");
+      
+      TH1D *hA = (TH1D*)htmp->Clone(Form("hA_%s",names[i].Data()));
+      
+      TF1 *fe = new TF1("fe","1+x*[0]/3034.");
+      fe->SetParameter(0,effslope);
+      for (int i=1;i<htmp->GetNbinsX()+1;i++)
+	{
+	  hA->SetBinContent(i,fe->Eval(htmp->GetBinCenter(i))*htmp->GetBinContent(i)*pow(3034.4-htmp->GetBinCenter(i),-5));
+	  hA->SetBinError(i,0,fe->Eval(htmp->GetBinCenter(i))*htmp->GetBinError(i)*pow(3034.4-htmp->GetBinCenter(i),-5));
+	  
+	}
+      c1->cd(2);
+      hA->SetLineColor(1);
+      hA->GetXaxis()->SetRangeUser(0,2950);
+      hA->SetTitle(Form("Predicted A(E) for %s",names[i].Data()));
+      hA->Draw("");
+      fout->cd();
+      TF1 *fu = new TF1(Form("fu_%s",names[i].Data()),"pol6");
+      hA->Fit(fu,"REM","",0,2950);
+      
+      TF1 *f2vbb = new TF1("f2vbb",Form("(x<[7])*fu_%s(x)*pow(([7]-x),5)*[8]",names[i].Data()),0,4000);
+
+      f2vbb->SetParameter(7,3034.4);
+      f2vbb->FixParameter(7,3034.4);
+      f2vbb->FixParameter(8,1);
+
+      
+      c1->cd(3);
+      htmp->Draw();
+  
+      htmp->SetLineColor(1);
+  
+      htmp->Fit(f2vbb,"REM","",50,3250);
+      gStyle->SetOptFit(1);
+      std::cout<<f2vbb->GetChisquare()<<std::endl;
+      std::cout<<f2vbb->GetNDF()<<std::endl;
+      f2vbb->Draw("same");
+      f2vbb->SetParameter(8,N0*G[i]/1e8);
+      TF1 *f2= new TF1("f2","f2vbb(x)*pow((3034.4-x),-5)",0,4000);
+
+      f2->Write(Form("fu_%s",names[i].Data()));
+
+      c1->Print("beta_debug.pdf","pdf");
     }
-  c1->cd(2);
-  hA->SetLineColor(1);
-  hA->GetXaxis()->SetRangeUser(0,2950);
-  hA->SetTitle("Predicted A(E)");
-  hA->Draw("");
-  TFile *fout = new TFile("SSD_AE.root","recreate");
-  TF1 *fu = new TF1("fu","pol6");
-  hA->Fit(fu,"REM","",0,2950);
-  fu->Write();
-  // now reconstruct the shape
-  TF1 *f2vbb = new TF1("f2vbb","(x<[7])*fu(x)*pow(([7]-x),5)",0,4000);
+  c1->Print("beta_debug.pdf)","pdf");
+  fout->Close();
+}
 
-  f2vbb->SetParameter(7,3034.4);
-  f2vbb->FixParameter(7,3034.4);
-  c1->cd(3);
-  h2vbb->Draw();
-  
-  h2vbb->SetLineColor(1);
-  
-  h2vbb->Fit(f2vbb,"REM","",50,3250);
-  gStyle->SetOptFit(1);
-  std::cout<<f2vbb->GetChisquare()<<std::endl;
-  std::cout<<f2vbb->GetNDF()<<std::endl;
-  f2vbb->Draw("same");
 
-  TF1 *f2= new TF1("f2","f2vbb(x)*pow((3034.4-x),-5)",0,4000);
-
-  f2->Write("fu");
-
-  // now compare shifting the Q-value
-  TCanvas *c2= new TCanvas("c2","c2");
+/*
+      // now compare shifting the Q-value
+      TCanvas *c2= new TCanvas("c2","c2");
   c2->cd();
   std::vector<double>shifts{100,20,10,0,-10,-20,-100};
   int counter=0;
@@ -93,32 +185,6 @@ void macro(double &Q,double &eQ,double binning=20,double fitlow=300,double facto
   TH1D *hModel=(TH1D*)hBkg->Clone();
   hModel->Add(h2vbb);
 
-  // create a CUPID-output
-  /*
-  TFile *fout_CUPID=new TFile("M1_data_bkg_model_CUPID.root","recreate");
-  TH1D *hBkg_CUPID=(TH1D*)hBkg->Clone("hBkg_CUPID");
-  TH1D *h2vbb_CUPID = (TH1D*)h2vbb->Clone("Crystal_2n2b_SSD_CUPID");
-
-  hBkg_CUPID->Scale(5000/(2.71*30.));
-  h2vbb_CUPID->Scale(5000/2.71);
-
-  int NCUPID=std::round((h2vbb_CUPID->Integral()+hBkg_CUPID->Integral()));
-  TH1D *hdata_CUPID=(TH1D*)hdata->Clone("hdata_CUPID");
-  TH1D *hModel_CUPID=(TH1D*)hBkg_CUPID->Clone("hModel_CUPID");
-  hModel_CUPID->Add(h2vbb_CUPID);
-  hdata_CUPID->Clear();
-  hdata_CUPID->Reset();
-  std::cout<<NCUPID<<std::endl;
-  for (int i=0;i<NCUPID;i++)
-    {
-      double E=hModel_CUPID->GetRandom();
-      hdata_CUPID->Fill(E);
-    }
-  hBkg_CUPID->Write("Background_model");
-  h2vbb_CUPID->Write("Crystal_2n2b_SSD");
-  hdata_CUPID->Write("Experimental_data");
-  fout->cd();
-  */
 
   // draw
   TCanvas *cBkg = new TCanvas("cBkg","cBkg");
@@ -234,97 +300,11 @@ void macro(double &Q,double &eQ,double binning=20,double fitlow=300,double facto
 
 }
 
-
+*/
 void Loop()
 {
   
   double Q;double eQ;
-  macro(Q,eQ,20,300,1);
-  /*
-  std::cout<<"Standard result is "<<Q<<" +/- "<<eQ<<" keV"<<std::endl;
-  double Qdef=Q; 
-  TGraphErrors *gBkg = new TGraphErrors();
-
-  std::vector<double>factor{0.95,0.96,0.97,0.98,0.99,1.0,1.01,1.02,1.03,1.04,1.05};
-  int counter=0;
-  
-  TCanvas *csyst=new TCanvas("csyst","csyst");
-  csyst->cd();
-  csyst->Divide(2,2);
-  csyst->cd(1);
-  for (auto &f:factor)
-    {
-      macro(Q,eQ,20,300,f);
-      gBkg->SetPoint(counter,f,(Q-Qdef));
-      gBkg->SetPointError(counter,0,eQ);
-      counter++;
-      
-    }
-  csyst->cd(1);
-  gBkg->SetTitle("Bkg subtraction systramtic ; Bkg Subtraction factor ; Shift [keV]; ");
-  gBkg->Draw("APE");
-
-  std::vector<double>low{200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700};
-  counter=0;
-  csyst->cd(2);
-  TGraphErrors *gRange = new TGraphErrors();
-  for (auto &l:low)
-    {
-      macro(Q,eQ,20,l,1);
-      gRange->SetPoint(counter,l,Q-Qdef);
-      gRange->SetPointError(counter,0,eQ);
-      counter++;
-    }
-  csyst->cd(2);
-  gRange->SetTitle("Fit range systematic ; Low range [keV] ; Shift [keV] ; ");
-  gRange->Draw("APE");
-  //  csyst->Update();
-
-  std::vector<double>binning{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,25,30,35,40,45,50,100,200};
-  TGraphErrors *gBinning = new TGraphErrors();
-  counter=0;
-  for (auto &b:binning)
-    {
-      macro(Q,eQ,b,300,1);
-      gBinning->SetPoint(counter,b,Q-Qdef);
-      gBinning->SetPointError(counter,0,eQ);
-      counter++;
-    }
-  csyst->cd(3);
-  gBinning->SetTitle("Binning range systematic ; Low range [keV] ; Shift [keV] ; ");
-  gBinning->Draw("APE");
-
-
-  // another possiblitiy is some slope to efficiency
-
-  std::ifstream ifile;
-  ifile.open("Eff.cfg");
-  double e1,e2,p1,p2,ep1,ep2;
-  ifile>>e1; ifile>>p1; ifile>>ep1;
-  ifile>>e2; ifile>>p2; ifile>>ep2;
-
-  p1/=e1; ep1/=e1;
-  p2/=e2; ep2/=e2;
-
-  TCanvas *ceff= new TCanvas("ceff","ceff");
-  TF1 *feff= new TF1("feff","[0]+[1]*x",0,3034);
-  feff->SetParameter(0,1);
-  feff->SetParameter(1,p1+p2);
-  std::cout<<"p1+p2 = "<<p1+p2<<" +/- "<<sqrt(ep1*ep1+ep2*ep2)<<std::endl;
-  feff->Draw();
-  
-  std::vector<double>effslope{-10,-5,-2,-1,0,1,2,5,10};
-  TGraphErrors *gEff = new TGraphErrors();
-  counter=0;
-  for (auto &e:effslope)
-    {
-      macro(Q,eQ,20,300,1,e/100.);
-      gEff->SetPoint(counter,e,Q-Qdef);
-      gEff->SetPointError(counter,0,eQ);
-      counter++;
-    }
-  csyst->cd(4);
-  gEff->SetTitle("Efficiency slope stematic ; Slope [%] ; Shift [keV] ; ");
-  gEff->Draw("APE");
-  */
+  macro(Q,eQ,0,1);
+ 
 }

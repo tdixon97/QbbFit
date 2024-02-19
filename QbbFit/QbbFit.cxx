@@ -10,20 +10,44 @@
 #include "TH3D.h"
 #include "TFile.h"
 #include <BAT/BCMath.h>
+
+double QbbFit::Norm(double Q)
+{
+  // get the normalisation of int A(E)*(Qnom-E)^5/ int A(E)*(Q-E)^5
+
+  double QDef=3034.4;
+  double NormDef;
+  double Norm;
+  if (fIsImp)
+    {
+      NormDef =fIntegrals[0]->Eval(QDef)+
+        fIntegrals[2]->Eval(QDef)*xi31+
+        xi31*xi31*fIntegrals[22]->Eval(QDef)/3.+
+        (fIntegrals[4]->Eval(QDef)*(xi31*xi31/3.+xi51));
+    }
+  else
+    {
+      NormDef=fIntegral->Eval(QDef);
+    }
+  if (fIsImp)
+    {
+      Norm =fIntegrals[0]->Eval(Q)+
+        fIntegrals[2]->Eval(Q)*xi31+
+        xi31*xi31*fIntegrals[22]->Eval(Q)/3.+
+        (fIntegrals[4]->Eval(Q)*(xi31*xi31/3.+xi51));
+    }
+  else
+    {
+      Norm=fIntegral->Eval(Q);
+    }
+  return NormDef/Norm;
+}
+
+  
 void QbbFit::MakePlots(TCanvas *&c, TCanvas *&cK, std::vector<double>pars)
 {
   
-  double S  = pars[0];
-  double B  = pars[1];
-  double p1 = pars[2];
-  double p2=pars[3];
-  double Q  = pars[4];
-  std::cout<<"best fit pars are : "<<std::endl;
-  std::cout<<"S                 : "<<S<<std::endl;
-  std::cout<<"B                 : "<<B<<std::endl;
-  std::cout<<"p1                : "<<p1<<std::endl;
-  std::cout<<"Q                 : "<<Q<<std::endl;
-
+ 
 
   TH1D *hKurieResid = (TH1D*)fData->Clone("hKurieResid");
   TH1D *hKurie =(TH1D*)fData->Clone("hKurie");
@@ -38,51 +62,16 @@ void QbbFit::MakePlots(TCanvas *&c, TCanvas *&cK, std::vector<double>pars)
   hKurie->SetLineColor(kBlack);
   hKurieResid->SetLineColor(kBlack);
   
-  
+  double Q=pars[fParameterMap["Qbb"]];
+
 
   for (int i=fData->FindBin(0);i<fData->FindBin(4000);i++)
     {
-
-      //      p1=0;
-      if (fFix)
-	{
-	  p1=0;
-	}
-      double energy =fData->GetBinCenter(i);
-      fEfficiency->SetParameter(0,p1);
-      fEfficiencyBkg->SetParameter(0,p1);
-      double B_pred = fEfficiencyBkg->Eval(energy)*B*fBkg->GetBinContent(fBkg->FindBin(energy));
-      hPlotBkg->SetBinContent(i,B_pred);
-      // get the predicted signal
-      double S_pred;
-      double energyBias;
-      if (fFloatBias)
-        {
-          fBiasp0=pars[5];
-          fBiasp1=pars[6];
-          fBiasp2=pars[7];
-
-
-
-          fEnergyBias->SetParameters(fBiasp0,fBiasp1,fBiasp2);
-	  
-	  energyBias=fEnergyBias->Eval(energy);
-	  
-        }
-
-      //fEfficiency->SetParameter(0,p1);
-      if (!fFloatBias)
-        {
-          S_pred=fBinning*S*fShape->Eval(energy)*fEfficiency->Eval(energy)*pow(Q-energy,5);
-        }
-      else
-        {
-          energy=energy-energyBias;
-          S_pred=fBinning*S*fShape->Eval(energy)*fEfficiency->Eval(energy)*pow(Q-energy,5);
-        }
-      if (S_pred<0)
-	S_pred=0;
       
+      double energy =fData->GetBinCenter(i);
+
+      double S_pred,B_pred;
+      GetSignalBackground(energy,pars,S_pred,B_pred);
       hPlotSig->SetBinContent(i,S_pred);
       
       
@@ -90,22 +79,24 @@ void QbbFit::MakePlots(TCanvas *&c, TCanvas *&cK, std::vector<double>pars)
 
 
       // FILL THE KURIE PLOT
-      
       double value = fData->GetBinContent(i)-B_pred;
-      if (value>0 &&fShape->Eval(energy)>0)
-        hKurie->SetBinContent(i,pow(value/(fBinning*fShape->Eval(energy)),0.2));
-      else if (value<0 &&fShape->Eval(energy)>0)
-        hKurie->SetBinContent(i,-pow(-value/(fBinning*fShape->Eval(energy)),0.2));
+      if (value>0 &&GetSpectrum(energy)>0)
+        hKurie->SetBinContent(i,pow(value/(fBinning*GetSpectrum(energy)),0.2));
+      else if (value<0 &&GetSpectrum(energy)>0)
+        hKurie->SetBinContent(i,-pow(-value/(fBinning*GetSpectrum(energy)),0.2));
       else
         hKurie->SetBinContent(i,0);
 
-      if (value>0 &&fShape->Eval(energy)>0)
-        hKurie->SetBinError(i,0,0.2*pow((value/(fBinning*fShape->Eval(energy))),-0.8)*fData->GetBinError(i)/(fBinning*fShape->Eval(energy)));
-      else if (value<0 &&fShape->Eval(energy)>0)
-        hKurie->SetBinError(i,0,0.2*pow(-(value/(fBinning*fShape->Eval(energy))),-0.8)*fData->GetBinError(i)/(fBinning*fShape->Eval(energy)));
+      if (value>0 &&GetSpectrum(energy)>0)
+        hKurie->SetBinError(i,0,0.2*pow((value/(fBinning*GetSpectrum(energy))),-0.8)*fData->GetBinError(i)/(fBinning*GetSpectrum(energy)));
+      else if (value<0 &&GetSpectrum(energy)>0)
+        hKurie->SetBinError(i,0,0.2*pow(-(value/(fBinning*GetSpectrum(energy))),-0.8)*fData->GetBinError(i)/(fBinning*GetSpectrum(energy)));
       else
 	hKurie->SetBinError(i,0,0);
+
       double resid = (hKurie->GetBinContent(i)-(Q-energy))/(hKurie->GetBinError(i));
+
+
       if (fabs(resid)<200)
 	{
 	  hKurieResid->SetBinContent(i,resid);
@@ -117,11 +108,15 @@ void QbbFit::MakePlots(TCanvas *&c, TCanvas *&cK, std::vector<double>pars)
           hKurieResid->SetBinError(i,0,0);
 
 	}
+
+
+
       // now get the errors up and down
       double eUp = fData->GetBinErrorUp(i);
       double eDown=fData->GetBinErrorLow(i);
       
-      //      std::cout<<"Enrgy  = "<<energy<<" VALUE = "<<fData->GetBinContent(i)<<" + / -  "<<eUp<<" , "<<eDown<<std::endl;
+
+
       if (fData->GetBinContent(i)!=0)
 	{
 	  
@@ -195,11 +190,10 @@ void QbbFit::MakePlots(TCanvas *&c, TCanvas *&cK, std::vector<double>pars)
   fConst->Draw("same");
 
   cK->cd();
-  //cK->SetBottomMargin(0.2);
+
   TLegend *l2 = new TLegend(0.7,0.6,0.9,0.9);
   hKurie->SetTitle(" ; Energy [keV] ; K(E) ; ");
-  //fData->GetYaxis()->SetRangeUser(0.0000000000001,10000000);
-
+  
   TF1 *fFit=  new TF1("fFit","(x<[0])*([0]-x)",0,4000);
   fFit->SetParameter(0,Q);
   fFit->SetNpx(1000);
@@ -215,40 +209,198 @@ void QbbFit::MakePlots(TCanvas *&c, TCanvas *&cK, std::vector<double>pars)
   l2->AddEntry(fFit,"Reconstruction");
   l2->Draw("same");
   cK->SetLogy(0);
-  /*
-  TPad* pad2 = new TPad("pad2", "pad2", 0., 0., 1., 1.);
-
-  pad2->SetTopMargin(0.8);
-  pad2->Draw();
-  hKurieResid->SetLineWidth(1);
-  hKurieResid->SetLineColor(kBlack);
-  pad2->SetFillStyle(0);
-  pad2->cd();
-  hKurieResid->GetYaxis()->SetLabelSize(0.02);
-  hKurieResid->SetTitle("; Energy [keV] ; Residual ;  ");
-  hKurieResid->Draw("E");
-  hKurieResid->GetXaxis()->SetRangeUser(000,3200);
-  hKurieResid->GetYaxis()->SetRangeUser(-5,5);
-
-  fConst->Draw("same");
-  */
+  
   cK->cd();
 
 }
+void QbbFit::SetRatioPrior(double ratio,double error)
+{
+  fIsRatioPrior=true;
+
+  fXiRatio=ratio;
+  fXiRatioError=error;
+
+}
   
+void QbbFit::GetSignalBackground(double &energy,const std::vector<double> &pars,double &S_pred,double &B_pred)
+{
+
+  double S  = pars[fParameterMap["fS"]];
+  double B  = pars[fParameterMap["fB"]];
+  // double xi31,xi51;
+  if (fIsImp)
+    {
+      xi31=pars[fParameterMap["xi31"]];
+      xi51=pars[fParameterMap["xi51"]];
+    }
+  double p1;
+  if (!fFix)
+    p1=pars[fParameterMap["p1"]];
+  double LYp0=1,LYp1=1,PCAp0=1,PCAp1=1;
+  double constant_eff=1;
+  if (fFullEfficiency)
+    {
+      LYp0=pars[fParameterMap["LYp0"]];
+      LYp1=pars[fParameterMap["LYp1"]];
+      PCAp0=pars[fParameterMap["PCAp0"]];
+      PCAp1=pars[fParameterMap["PCAp1"]];
+      constant_eff=pars[fParameterMap["constant_eff"]];
+    }
+  double Q  = pars[fParameterMap["Qbb"]];
+  S*=Norm(Q);
+  if (fFix)
+    {
+      p1=0;
+    }
+  
+  double energyBias;
+  if (fFloatBias==true)
+    {
+      
+      fBiasp0=pars[fParameterMap["Biasp0"]];
+      fBiasp1=pars[fParameterMap["Biasp1"]];
+      fBiasp2=pars[fParameterMap["Biasp2"]];
+      
+      
+
+      fEnergyBias->SetParameters(fBiasp0,fBiasp1,fBiasp2);
+      energyBias=fEnergyBias->Eval(energy);
+    }
+  else
+    {
+      energyBias=0;
+    }
+  // set the TF1 values                                                                                                                                                                                         
+  if (!fFix)
+    {
+      fEfficiency->SetParameter(0,p1);
+    }
+  if (fFullEfficiency==true)
+    {
+	  
+      fLYEff->SetParameters(LYp0,LYp1);
+      fPCAEff->SetParameters(PCAp0,PCAp1);
+    }
+
+  double efficiency_S;
+  double efficiency_B;
+  if (fFullEfficiency==false)
+    {
+      efficiency_S=GetEfficiency(energy,constant_eff,1);
+      efficiency_B=efficiency_S;
+    }
+  else
+    {
+      efficiency_S=GetEfficiency(energy,constant_eff,0);
+      efficiency_B=GetEfficiency(energy,constant_eff,1);
+    }
+  B_pred = efficiency_B*B*fBkg->GetBinContent(fBkg->FindBin(energy));
+  
+  energy=-energyBias+energy;
+  
+  S_pred=fBinning*S*GetSpectrum(energy)*efficiency_S*pow(Q-energy,5);
+ 
+  if (energy>Q)
+    {
+      
+      S_pred=0;
+    }
+  
+}
+
+double QbbFit::GetSpectrum(double &energy)
+{
+  if (fIsImp)
+    {
+      return fShapes[0]->Eval(energy)+
+	fShapes[2]->Eval(energy)*xi31+
+	xi31*xi31*fShapes[22]->Eval(energy)/3.+                                                                              
+	(fShapes[4]->Eval(energy)*(xi31*xi31/3.+xi51));
+    }
+  return fShape->Eval(energy);
+}
+
+double QbbFit::GetEfficiency(double &energy,double &constant_eff,bool &simple)
+{
+
+  double eff=1;
+  if (simple &&!fFix)
+    {
+      // the basic model of non-constant efficency
+      eff=fEfficiency->Eval(energy);
+
+    }
+  else if(!simple &&!fFix)
+    {
+      // we have to divide the MC by the value in MC
+      eff/=fEffValMC;
+      eff*=constant_eff;
+      
+      eff*=fLYEff->Eval(energy);
+      eff*=fPCAEff->Eval(energy);
+      if (fCounter%1000000==0)
+	{
+	  std::cout<<"eff = "<<eff<<std::endl;
+	  std::cout<<"constant_eff = "<<constant_eff<<std::endl;
+	  std::cout<<"LY_eff = "<<fLYEff->Eval(energy)<<std::endl;
+	  std::cout<<"energy = "<<energy<<std::endl;
+	  std::cout<<"PCA_eff = "<<fPCAEff->Eval(energy)<<std::endl;
+	  std::cout<< " "<<std::endl;
+	}
+      fCounter++;
+    }
+  return eff;
+}
+
+TF1 * QbbFit::GetIntegralFunction(TF1 *&f,TString name)
+{
+  TF1 *fout = new TF1(name,"pow(x,6)*(4620*[0]+660*[1]*x+165*[2]*pow(x,2)+55*[3]*pow(x,3)+22*[4]*pow(x,4)+10*[5]*pow(x,5)+5*[6]*pow(x,6))",0,4000);
+
+  
+  fout->SetParameters(f->GetParameters());
+  return fout;
+}
   // ---------------------------------------------------------
-QbbFit::QbbFit(const std::string& name,TString path_shape,TString path_bkg,TString path_bias,bool fix,bool floatbias,bool fullefficiency)
+QbbFit::QbbFit(const std::string& name,TString path_shape,TString path_bkg,TString path_bias,bool fix,bool floatbias,bool fullefficiency,double effvalMC,bool imp)
     : BCModel(name)
 {
 
-
+  fIsRatioPrior=0;
   fFix=fix;
   // get the inputs
   fFloatBias=floatbias;
   fFullEfficiency=fullefficiency;
+  fEffValMC=effvalMC;
+  fIsImp=imp;
+  if (fFullEfficiency)
+    {
+      fLYEff=new TF1("fLYEff","pol1",0,4000);
+      fPCAEff=new TF1("fPCAEff","pol1",0,4000);
+    }
+
   TFile *f_shape = new TFile(path_shape);
-  fShape =(TF1*)f_shape->Get("fu");
-  f_shape->ls();
+
+  
+  if (!imp)
+    {
+      fShape =(TF1*)f_shape->Get("fu");
+      fIntegral=(TF1*)GetIntegralFunction(fShape,"fint");
+    }
+  else
+    {
+      f_shape->ls();
+
+
+      fShapes[0]=(TF1*)f_shape->Get("fu_h0");
+      fShapes[2]=(TF1*)f_shape->Get(Form("fu_h2"));
+      fShapes[22]=(TF1*)f_shape->Get(Form("fu_h22"));
+      fShapes[4]=(TF1*)f_shape->Get(Form("fu_h4"));
+
+      fIntegrals[0]=(TF1*)GetIntegralFunction(fShapes[0],"f_int_0");
+      fIntegrals[2]=(TF1*)GetIntegralFunction(fShapes[2],"f_int_2");
+      fIntegrals[22]=(TF1*)GetIntegralFunction(fShapes[22],"f_int_22");
+      fIntegrals[4]=(TF1*)GetIntegralFunction(fShapes[4],"f_int_4");
+    }
   TFile *f_bkg = new TFile(path_bkg);
   fBkg = (TH1D*)f_bkg->Get("Background_model");
   fData=(TH1D*)f_bkg->Get("Experimental_data");
@@ -267,10 +419,8 @@ QbbFit::QbbFit(const std::string& name,TString path_shape,TString path_bkg,TStri
   fUpper=3500.;
   fLower=100.;
   fCounter=0;
-  fBinning=1;
+  fBinning=10;
 
-  fBkg->Rebin(fBinning);
-  fData->Rebin(fBinning);
   
   // Define parameters here in the constructor.
   // we have parameters
@@ -278,18 +428,50 @@ QbbFit::QbbFit(const std::string& name,TString path_shape,TString path_bkg,TStri
   // 2) Normalisation of bkg again [0,2]
   // 3) Efficiency fraction from [0.9,1.1]
   // 4) Qbb from [3034-100,3034+100]
+  int counter=0;
+  AddParameter("fS",0.5,1.5,"f_{S}"," ");
+  fParameterMap["fS"]=counter;
+  counter++;
 
-  AddParameter("fS",0.9,1.1,"f_{S}"," ");
-  AddParameter("fB",0.9,1.1,"f_{B}"," ");
-  AddParameter("p1",-0.2,0.2,"p1"," ");
+  if (imp)
+    {
+      AddParameter("xi31",0,2,"#xi_{3,1}"," ");
+      fParameterMap["xi31"]=counter;
+      counter++;
+      
+      AddParameter("xi51",0,2,"#xi_{5,1}"," ");
+      fParameterMap["xi51"]=counter;
+      counter++;
+    }
+  AddParameter("fB",0.5,1.5,"f_{B}"," ");
+  fParameterMap["fB"]=counter;
+  counter++;
 
+  if (!fFix)
+    {
+      AddParameter("p1",-0.2,0.2,"p1"," ");
+      fParameterMap["p1"]=counter;
+      counter++;
+    }
   AddParameter("Qbb",3034-20,3034+20,"Q_{#beta#beta}","[keV]");
+  fParameterMap["Qbb"]=counter;
+  counter++;
+
 
   if (fFloatBias==true)
     {
       AddParameter("Biasp0",-2,2,"biasp0"," ");
+      fParameterMap["Biasp0"]=counter;
+      counter++;
+      
       AddParameter("Biasp1",-2e-3,1e-3,"biasp1"," ");
+      fParameterMap["Biasp1"]=counter;
+      counter++;
+  
       AddParameter("Biasp2",-5e-7,7e-7,"biasp2"," ");
+      fParameterMap["Biasp2"]=counter;
+      counter++;
+
     }
 
   
@@ -298,10 +480,25 @@ QbbFit::QbbFit(const std::string& name,TString path_shape,TString path_bkg,TStri
  
   if (fFullEfficiency==true)
     {
-      AddParameter("PCAp0",0,2,"PCAp0"," ");
-      AddParameter("PCAp1",-1e-3,1e-3,"PCAp1"," ");
-      AddParameter("LYp0",0,2,"LYp0"," ");
-      AddParameter("LYp1",-1e-3,1e-3,"LYp1"," ");
+      AddParameter("PCAp0",.9,1.02,"PCAp0"," ");
+      fParameterMap["PCAp0"]=counter;
+      counter++;
+
+      AddParameter("PCAp1",-7e-5,7e-5,"PCAp1"," ");
+      fParameterMap["PCAp1"]=counter;
+      counter++;
+
+      AddParameter("LYp0",.9,1.02,"LYp0"," ");
+      fParameterMap["LYp0"]=counter;
+      counter++;
+
+      AddParameter("LYp1",-7e-5,7e-5,"LYp1"," ");
+      fParameterMap["LYp1"]=counter;
+      counter++;
+
+      AddParameter("constant_eff",0.9,1,"constant_eff"," ");
+      fParameterMap["constant_eff"]=counter;
+      counter++;
 
     }
 
@@ -323,86 +520,36 @@ double QbbFit::LogLikelihood(const std::vector<double>& pars)
   // the likelihood if a simple binned one
   int verbose;
   double logL=0;
-  if (fCounter%10000000==0)
-    {
-      verbose=1;
-    }
-  else
-    {
-      verbose=0;
-    }
+  int counter=0;
 
-  double S  = pars[0];
-  double B  = pars[1];
-  double p1 = pars[2];
-  double Q  = pars[4];
-
-
-
+  
   for (int i=fData->FindBin(fLower);i<fData->FindBin(fUpper);i++)
-    {;
+    {
       // get th
       double energy =fData->GetBinCenter(i);
       double N = fData->GetBinContent(i);
-      //p1=0;
-      if (fFix)
-	{
-	  p1=0;
-	}
-
-      double energyBias;
-      if (fFloatBias==true)
-	{
-	  fBiasp0=pars[5];
-	  fBiasp1=pars[6];
-	  fBiasp2=pars[7];
-	  
-
-	  
-	  fEnergyBias->SetParameters(fBiasp0,fBiasp1,fBiasp2);
-	  energyBias=fEnergyBias->Eval(energy);
-	}
-      fEfficiency->SetParameter(0,p1);
-      fEfficiencyBkg->SetParameter(0,p1);
-      // get the predicted background
-      double B_pred = fEfficiencyBkg->Eval(energy)*B*fBkg->GetBinContent(fBkg->FindBin(energy));
-
-      
-      // get the predicted signal
-      //fEfficiency->SetParameter(0,p1);
-      
-      double S_pred;
-      if (!fFloatBias)
-	{
-	  S_pred=fBinning*S*fShape->Eval(energy)*fEfficiency->Eval(energy)*pow(Q-energy,5);
-	}
-      else
-	{
-	  energy=-energyBias+energy;
-	  S_pred=fBinning*S*fShape->Eval(energy)*fEfficiency->Eval(energy)*pow(Q-energy,5);
-	}
-      if (energy>Q)
-	{
-
-	  S_pred=0;
-	}
+      double S_pred,B_pred;
+      GetSignalBackground(energy,pars,S_pred,B_pred);
       double lambda = B_pred+S_pred;
-      //std::cout<<lambda<<std::endl;
-      if( lambda <= 0. ) continue;
-      logL += -lambda + N * log( lambda ) - BCMath::LogFact( N );
-
-      if (i==17 && fCounter%100000==0)
-	{
+      counter++;
+      if ( fCounter%10000==0 &&counter==200 )
+        {
           std::cout<<"energy = "<<energy<<std::endl;
           std::cout<<"N      = "<<N<<std::endl;
           std::cout<<"b      = "<<B_pred<<std::endl;
           std::cout<<"sig    = "<<S_pred<<std::endl;
-          std::cout<<"lambda = "<<lambda<<std::endl;
+	  std::cout<<"xi     = "<<xi31<<" , "<<xi51<<std::endl;
+	  std::cout<<"lambda = "<<lambda<<std::endl;
           std::cout<<"logL   = "<<logL<<std::endl;
           std::cout<<" "<<std::endl;
         }
 
+      if( lambda <= 0. ) continue;
+      logL += -lambda + N * log( lambda ) - BCMath::LogFact( N );
 
+      
+      
+     
     }
   fCounter++;
   return logL;
@@ -420,29 +567,78 @@ double QbbFit::LogLikelihood(const std::vector<double>& pars)
 
    double logPrior=0;
 
-
+   return 1;
    // 0,1,2,3 have uniform
    double low,high;
-   for (int i=0;i<4;i++)
+   std::vector<std::string> par_name{"fS","fB","Qbb"};
+   
+
+   for (auto & par:par_name)
      {
-       low =GetParameter(i).GetLowerLimit();
-       high =GetParameter(i).GetUpperLimit();
-       if (pars[i]>low &&pars[i]<high)
+       low =GetParameter(fParameterMap[par]).GetLowerLimit();
+       high =GetParameter(fParameterMap[par]).GetUpperLimit();
+       if (pars[fParameterMap[par]]>low &&pars[fParameterMap[par]]<high)
 	 logPrior+=log(1/(high-low));
        else
 	 logPrior-=1e20;
-     
      }
+ 
        
    double mean=0;
    double sigma=fp1Sigma;
    // gaussian prior on par 4
-   if (fFix==0)
-     logPrior+=log(1/(sqrt(2*3.14)*sigma))-pow((pars[4]-mean)/sigma,2)/0.5;
+   //if (fFix==0)
+   //logPrior+=log(1/(sqrt(2*3.14)*sigma))-pow((pars[fParameterMap["p1"]]-mean)/sigma,2)/0.5;
 
+   if (fIsRatioPrior==1)
+     logPrior+=log(1/(sqrt(2*3.14)*fXiRatioError))-pow((pars[fParameterMap["xi51"]]/pars[fParameterMap["xi31"]]-fXiRatio)/fXiRatioError,2)/0.5;
+   
+   if (fFullEfficiency)
+     {
+       double LYp0=pars[fParameterMap["LYp0"]];
+       double LYp1=pars[fParameterMap["LYp1"]];
+       double PCAp0=pars[fParameterMap["PCAp0"]];
+       double PCAp1=pars[fParameterMap["PCAp1"]];
+       double constant_eff=pars[fParameterMap["constant_eff"]];
+       
+       double probLY = fLYEffHisto->GetBinContent(fLYEffHisto->FindBin(LYp1,LYp0));
+       double probPCA=(fPCAEffHisto->GetBinContent(fPCAEffHisto->FindBin(PCAp1,PCAp0)));
+       sigma =fConstantEffSigma;
+       mean=fConstantEffMean;
+       double prob_constant=log(1/(sqrt(2*3.14)*sigma))-pow((constant_eff-mean)/sigma,2)/0.5;
+     
+       if (probLY!=0)
+	{
+          logPrior+=log(probLY);
+        }
+      else
+        logPrior-=1e20;
+
+       if (probPCA!=0)
+	 {
+	   logPrior+=log(probPCA);
+        }
+       else
+	 logPrior-=1e20;
+
+       logPrior+=prob_constant;
+     
+       if (fCounter%100000==0)
+	 {
+	   std::cout<<"p(const) = "<<prob_constant<<std::endl;
+	   std::cout<<"p(PCA) = "<<probPCA<<std::endl;
+	   std::cout<<"p(lY) = "<<probLY<<std::endl;
+	   std::cout<<"pars PCA = "<<PCAp0<<" , "<<PCAp1<<std::endl;
+	   std::cout<<"pars LY = "<<LYp0<<" , "<<LYp1<<std::endl;
+	   std::cout<<" logPrior = "<<logPrior<<std::endl;
+	 }
+     }
    if (fFloatBias==true)
     {
-      double prob = fBias->GetBinContent(fBias->FindBin(pars[7],pars[6],pars[5]));
+      int p2 = fParameterMap["Biasp2"];
+      int p0=fParameterMap["Biasp0"];
+      int p1=fParameterMap["Biasp1"];
+      double prob = fBias->GetBinContent(fBias->FindBin(pars[p2],pars[p1],pars[p0]));
 
       if (prob!=0)
 	{
@@ -452,14 +648,6 @@ double QbbFit::LogLikelihood(const std::vector<double>& pars)
 	logPrior-=1e20;
     
     }
-
-   if (fCounter%100000==0)
-     {
-       std::cout<<"log Prior = "<<logPrior<<std::endl;
-       std::cout<<pars[5]<<" "<<pars[6]<<" "<<pars[7]<<std::endl;
-
-     }
-
    return logPrior;
   
 
