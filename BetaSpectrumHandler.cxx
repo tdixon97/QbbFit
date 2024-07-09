@@ -111,8 +111,11 @@ void interpolate_spectrum(bool imp,std::string path,std::string plot,std::string
       
       TH1D *hA = (TH1D*)htmp->Clone(Form("hA_%s",names[i].Data()));
       
+      // Create the efficiency function
       TF1 *fe = new TF1("fe",Form("1+x*[0]/%f",Qbb));
       fe->SetParameter(0,0);
+
+      // fill a histogram of the A(E)
       for (int i=1;i<htmp->GetNbinsX()+1;i++)
       {
         hA->SetBinContent(i,fe->Eval(htmp->GetBinCenter(i))*htmp->GetBinContent(i)*pow(Qbb-htmp->GetBinCenter(i),-5));
@@ -125,9 +128,12 @@ void interpolate_spectrum(bool imp,std::string path,std::string plot,std::string
       hA->SetTitle(Form("Predicted A(E) for %s",names[i].Data()));
       hA->Draw("");
       fout->cd();
+
+      // creatae the nth order polynomial of A(E) and fit it (initial guesses)
       TF1 *fu = new TF1(Form("fu_%s",names[i].Data()),Form("pol%i",order));
       hA->Fit(fu,"REM","",0,2950);
       
+      // scale the polynomial by (Q-E)^5
       TF1 *f2vbb = new TF1("f2vbb",Form("(x<[%i])*fu_%s(x)*pow(([%i]-x),5)*[%i]",order+1,names[i].Data(),order+1,order+2),0,4000);
 
       f2vbb->SetParameter(order+1,Qbb);
@@ -137,10 +143,10 @@ void interpolate_spectrum(bool imp,std::string path,std::string plot,std::string
   
       c1->cd(2);
       htmp->Draw();
-  
       htmp->SetLineColor(1);
-  
-      htmp->Fit(f2vbb,"REM","",50,3250);
+
+      // fit this with a likelihood fit
+      htmp->Fit(f2vbb,"REML","",50,3250);
       gStyle->SetOptFit(1);
       std::cout<<f2vbb->GetChisquare()<<std::endl;
       std::cout<<f2vbb->GetNDF()<<std::endl;
@@ -148,6 +154,7 @@ void interpolate_spectrum(bool imp,std::string path,std::string plot,std::string
       f2vbb->SetParameter(order+2,N0*G[i]/1e8);
       TF1 *f2= new TF1("f2",Form("f2vbb(x)*pow((%f-x),-5)",Qbb),0,4000);
 
+      // Write just the A(E) part
       f2->Write(Form("fu_%s",names[i].Data()));
       c1->Print(plot.c_str(),"pdf");
     }
