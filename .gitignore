@@ -1,3 +1,9 @@
 *.root
 *~
 *.pdf
+plots/*
+inputs/*
+EnergyBias/*
+QbbFit/*.root
+QbbFit/fits/*
+
