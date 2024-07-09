@@ -6,4 +6,6 @@ inputs/*
 EnergyBias/*
 QbbFit/*.root
 QbbFit/fits/*
+QbbFit/macros/*
+
 
