@@ -7,5 +7,9 @@ EnergyBias/*
 QbbFit/*.root
 QbbFit/fits/*
 QbbFit/macros/*
+QbbFit/log/*
+QbbFit/*.o
+QbbFit/*.txt
+QbbFit/*.d
 
 
