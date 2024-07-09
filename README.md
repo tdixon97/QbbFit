@@ -36,12 +36,9 @@ The code to run this can be compiled with:
 
 It can then be run with:
 
-    ./BetaSpectrumHandler -h
-
-Which prints the options:
-
     ./BetaSpectrumHandler -l [plot_path] -i [input_path] -p [polynomial order] -q [Qbb] -o [outpath] 
-    add the option -I to use the improved model and -h for this help
+
+add the option -I to use the improved model and -h for this help
 
 ### QbbFit
 The next part of the analysis chain consists of a BAT code called QbbFit which performs a background model fit on the spectrum using the analytic approximation of the $2\nu\beta\beta$ decay spectrum shape.
