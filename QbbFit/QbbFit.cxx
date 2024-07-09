@@ -9,6 +9,7 @@
 #include "TF1.h"
 #include "TH3D.h"
 #include "TFile.h"
+#include "TMath.h"
 #include <BAT/BCMath.h>
 
 double QbbFit::Norm(double Q)
@@ -92,22 +93,22 @@ void QbbFit::MakePlots(TCanvas *&c, TCanvas *&cK, std::vector<double>pars)
       else if (value<0 &&GetSpectrum(energy)>0)
         hKurie->SetBinError(i,0,0.2*pow(-(value/(fBinning*GetSpectrum(energy))),-0.8)*fData->GetBinError(i)/(fBinning*GetSpectrum(energy)));
       else
-	hKurie->SetBinError(i,0,0);
+	      hKurie->SetBinError(i,0,0);
 
       double resid = (hKurie->GetBinContent(i)-(Q-energy))/(hKurie->GetBinError(i));
 
 
       if (fabs(resid)<200)
-	{
-	  hKurieResid->SetBinContent(i,resid);
-	  hKurieResid->SetBinError(i,0,1);
-	}
+      {
+        hKurieResid->SetBinContent(i,resid);
+        hKurieResid->SetBinError(i,0,1);
+      }
       else
-	{
-	  hKurieResid->SetBinContent(i,0);
-          hKurieResid->SetBinError(i,0,0);
+      {
+        hKurieResid->SetBinContent(i,0);
+              hKurieResid->SetBinError(i,0,0);
 
-	}
+      }
 
 
 
@@ -151,7 +152,6 @@ void QbbFit::MakePlots(TCanvas *&c, TCanvas *&cK, std::vector<double>pars)
   c->SetBottomMargin(0.2);
   TLegend *l = new TLegend(0.7,0.7,0.9,0.9);
   fData->SetTitle(" ; Energy [keV] ; counts/bin ; ");
-  //fData->GetYaxis()->SetRangeUser(0.0000000000001,10000000);
   fData->GetXaxis()->SetRangeUser(00,3200);
   fData->GetYaxis()->SetRangeUser(0.01,2000);
   fData->Draw("E");
@@ -320,7 +320,7 @@ double QbbFit::GetSpectrum(double &energy)
   return fShape->Eval(energy);
 }
 
-double QbbFit::GetEfficiency(double &energy,double &constant_eff,bool &simple)
+double QbbFit::GetEfficiency(double &energy,double &constant_eff,bool simple)
 {
 
   double eff=1;
@@ -354,12 +354,20 @@ double QbbFit::GetEfficiency(double &energy,double &constant_eff,bool &simple)
 
 TF1 * QbbFit::GetIntegralFunction(TF1 *&f,TString name)
 {
-  TF1 *fout = new TF1(name,"pow(x,6)*(4620*[0]+660*[1]*x+165*[2]*pow(x,2)+55*[3]*pow(x,3)+22*[4]*pow(x,4)+10*[5]*pow(x,5)+5*[6]*pow(x,6))",0,4000);
 
-  
+  //TF1 *fout = new TF1(name,"pow(x,6)*(4620*[0]+660*[1]*x+165*[2]*pow(x,2)+55*[3]*pow(x,3)+22*[4]*pow(x,4)+10*[5]*pow(x,5)+5*[6]*pow(x,6))",0,4000);
+  TString integral ="";
+  for (int i=0;i<f->GetNpar()-2;i++)
+  {
+    integral+=Form("(TMath::Factorial(5)*TMath::Factorial(%i)*TMath::Power(x,5+%i+1)/TMath::Factorial(5+%i+1))+",i,i,i);
+  }
+  integral+="0";
+
+  TF1 * fout = new TF1(name,integral,0,4000);
   fout->SetParameters(f->GetParameters());
   return fout;
 }
+
   // ---------------------------------------------------------
 QbbFit::QbbFit(const std::string& name,TString path_shape,TString path_bkg,TString path_bias,bool fix,bool floatbias,bool fullefficiency,double effvalMC,bool imp)
     : BCModel(name)
@@ -380,7 +388,7 @@ QbbFit::QbbFit(const std::string& name,TString path_shape,TString path_bkg,TStri
 
   TFile *f_shape = new TFile(path_shape);
 
-  
+  std::cout<<"is improved "<<imp<<std::endl;
   if (!imp)
     {
       fShape =(TF1*)f_shape->Get("fu");
@@ -502,7 +510,7 @@ QbbFit::QbbFit(const std::string& name,TString path_shape,TString path_bkg,TStri
 
     }
 
-  GetParameters().SetNBins(500);
+  GetParameters().SetNBins(100);
 
   
 }
@@ -538,8 +546,8 @@ double QbbFit::LogLikelihood(const std::vector<double>& pars)
           std::cout<<"N      = "<<N<<std::endl;
           std::cout<<"b      = "<<B_pred<<std::endl;
           std::cout<<"sig    = "<<S_pred<<std::endl;
-	  std::cout<<"xi     = "<<xi31<<" , "<<xi51<<std::endl;
-	  std::cout<<"lambda = "<<lambda<<std::endl;
+	        std::cout<<"xi     = "<<xi31<<" , "<<xi51<<std::endl;
+	        std::cout<<"lambda = "<<lambda<<std::endl;
           std::cout<<"logL   = "<<logL<<std::endl;
           std::cout<<" "<<std::endl;
         }
@@ -586,10 +594,7 @@ double QbbFit::LogLikelihood(const std::vector<double>& pars)
        
    double mean=0;
    double sigma=fp1Sigma;
-   // gaussian prior on par 4
-   //if (fFix==0)
-   //logPrior+=log(1/(sqrt(2*3.14)*sigma))-pow((pars[fParameterMap["p1"]]-mean)/sigma,2)/0.5;
-
+ 
    if (fIsRatioPrior==1)
      logPrior+=log(1/(sqrt(2*3.14)*fXiRatioError))-pow((pars[fParameterMap["xi51"]]/pars[fParameterMap["xi31"]]-fXiRatio)/fXiRatioError,2)/0.5;
    
@@ -655,9 +660,3 @@ double QbbFit::LogLikelihood(const std::vector<double>& pars)
 
  }
 
-// ---------------------------------------------------------
-// void QbbFit::CalculateObservables(const std::vector<double>& pars)
-// {
-//     // Calculate and store obvserables. For example:
-//     GetObservable(0) = pow(pars[0], 2);
-// }

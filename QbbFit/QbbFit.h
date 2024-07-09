@@ -33,7 +33,7 @@ public:
   void SetUpperLower(double low,double up){fUpper=up;fLower=low;};
   double GetUpper(){return fUpper;};
   double GetLower(){return fLower;};
-  double GetSpectrum(double energy);
+  double GetSpectrum(double &energy);
   TF1 * GetIntegralFunction(TF1 *&f,TString name);
   double Norm(double Q);
   void SetRatioPrior(double ratio,double error);
@@ -46,8 +46,8 @@ public:
   bool fFix;
   // Overload LogAprioriProbability if not using built-in 1D priors
   double LogAPrioriProbability(const std::vector<double> & pars);
-  double GetEfficiency(double energy,double constant_eff,bool simple);
-  void GetSignalBackground(double energy,const std::vector<double> &pars,double &S_pred,double &B_pred);
+  double GetEfficiency(double &energy,double & constant_eff,bool simple);
+  void GetSignalBackground(double &energy,const std::vector<double> &pars,double &S_pred,double &B_pred);
   void SetConstantEff(double &mean,double &sigma){fConstantEffMean=mean; fConstantEffSigma=sigma;};
   void SetThreshold(double t){fLower=t;};
   void SetBinning(int b){fBinning=b;  fBkg->Rebin(fBinning);fData->Rebin(fBinning);};

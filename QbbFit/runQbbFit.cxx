@@ -217,6 +217,7 @@ int main(int argc,char **argv)
   std::cout<<"theory file         : "<<theory_file<<std::endl;
   std::cout<<"bkg file            : "<<bkg_file<<std::endl;
   std::cout<<"bias file           : "<<bias_file<<std::endl;
+  std::cout<<"is improved         : "<<is_imp<<std::endl;
   std::cout<<"LY file             : "<<LY_file<<std::endl;
   std::cout<<"PCA file            : "<<PCA_file<<std::endl;
   std::cout<<"const eff           : "<<constant_eff_mean<<" , "<<constant_eff_sigma<<std::endl;
