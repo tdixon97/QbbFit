@@ -30,6 +30,18 @@ Thus we can parameterise independently each of the additive contributions to the
 The first part of the analysis is contained in a script called `BetaSpectrumHandler.cxx`, which performs this parameterisation.
 This code takes in a MC simulation of the $2\nu\beta\beta$ decay obtained with the $Q=3034.4$ keV.
 It then fits this spectrum to $A(E)\times (Q-E)^5$, whether $A(E)$ is parameterised as a 6th order polynomial.
+The code to run this can be compiled with:
+
+    g++ -std=c++11 -g -o BetaSpectrumHandler BetaSpectrumHandler.cxx $(root-config --cflags --libs)  
+
+It can then be run with:
+
+    ./BetaSpectrumHandler -h
+
+Which prints the options:
+
+    ./BetaSpectrumHandler -l [plot_path] -i [input_path] -p [polynomial order] -q [Qbb] -o [outpath] 
+    add the option -I to use the improved model and -h for this help
 
 ### QbbFit
 The next part of the analysis chain consists of a BAT code called QbbFit which performs a background model fit on the spectrum using the analytic approximation of the $2\nu\beta\beta$ decay spectrum shape.
